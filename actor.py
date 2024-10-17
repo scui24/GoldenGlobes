@@ -14,8 +14,10 @@ for i in range(0, len(dataset['text'])):
 	    continue
 
 	pattern = r"best actor"
+	pattern_hashtag = r"#bestactor"
 	name_pattern = r"[A-Z][a-zA-Z]*\s[A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*)*"
 	match = re.search(pattern, dataset['text'][i], re.IGNORECASE)
+	match_hashtag = re.search(pattern_hashtag, dataset['text'][i], re.IGNORECASE)
 	if match:
 		found.append(dataset['text'][i])
 		name_matches = re.findall(name_pattern, dataset['text'][i])
