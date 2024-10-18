@@ -44,4 +44,8 @@ max_freq = max(freq)
 max_index = freq.index(max_freq)
 winner = nominees[max_index]
 
-print(winner)
+print('Winner: ' + winner)
+
+for i in range(len(freq)):
+	if freq[i] > 100:
+		print(nominees[i] + ' ' + str(freq[i]))
