@@ -1,0 +1,23 @@
+if TV show:
+	if best performance by actor:
+
+	elif award2:
+	elif a3
+	else a4
+elif People:
+
+
+for each tweet:
+	if contain person: #spacy
+		person.append
+	if contain tv show/film: #IMDB
+	if contain song: #Spotify
+for p in person:
+	if fits pattern _x_ wins _y_:
+		for awards for ppl:
+			determine how similar is y to award
+		most similar return
+	else fits pattern __nominated__
+for show:
+	if fits:
+		for awards for show
