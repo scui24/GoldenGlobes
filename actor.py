@@ -1,13 +1,15 @@
 import pandas as pd
 import csv
 import re
-import nltk
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from nltk.stem.porter import PorterStemmer
 from ftfy import fix_text
 import unidecode
+import nltk
 from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
+# Return sentiment score of the given tweet
 def sentiment_scores(sentence):
     sid_obj = SentimentIntensityAnalyzer()
     sentiment_dict = sid_obj.polarity_scores(sentence)
@@ -20,8 +22,18 @@ def sentiment_scores(sentence):
     # else:
     #     return "Neutral"
 
+lemmatizer = WordNetLemmatizer()
+stop_words = set(stopwords.words('english'))
+
+# Normalize the tweet
+def normalize(text):
+    tokens = word_tokenize(text.lower())
+    tokens = [lemmatizer.lemmatize(word) for word in tokens if word.isalnum() and word not in stop_words]
+    return tokens
+
 dataset = pd.read_csv('output.csv')
 
+text = []
 found = []
 nominees = []
 freq = []
@@ -29,25 +41,14 @@ sentiment = []
 for i in range(0, len(dataset['text'])):
 	if (type(dataset['text'][i]) is not type("str")):
 	    print(int(i + 2))
-	    corpus.append("error")
+	    text.append("error")
 	    continue
 
-	# nltk.download('stopwords')
-	# nltk.download('words')
-	# words = set(nltk.corpus.words.words())
-
-	# review = fix_text(dataset['text'][i])
-	# # review = unidecode(review) # remove emojis
-	# review = re.sub(r'http\S+', '', review)
-
-	# review = review.lower()
-	# review = review.split()
-	# ps = PorterStemmer()
-	# all_stopwords = stopwords.words('english')
-	# review = [ps.stem(word) for word in review if not word in set(all_stopwords)]
-	# print(type(review))
-	# review = ' '.join(w for w in nltk.wordpunct_tokenize(review) if w.lower() in words)
-	# text = review
+	# Data preprocessing
+	text = fix_text(dataset['text'][i])
+	# review = unidecode(review) # remove emojis
+	text = re.sub(r'http\S+', '', text)
+	text = normalize(text)
 
 	pattern_gg = r"(?i)#?golden\s?globes"
 	text = re.sub(pattern_gg, '', dataset['text'][i]) # Remove golden globes
@@ -62,7 +63,6 @@ for i in range(0, len(dataset['text'])):
 	if match or match_hashtag:
 		found.append(text)
 		name_matches = re.findall(pattern_name, text)
-		# remaining task: deal with "I" & "The"
 		for name in name_matches:
 			if re.search(pattern_gg, name) or re.search(pattern_actor, name): # Remove Best Actor & Golden Globes
 				continue
