@@ -13,6 +13,7 @@ from ftfy import fix_text
 from fuzzywuzzy import fuzz
 
 nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
@@ -26,10 +27,28 @@ def normalize(text):
 
 # Stemming algorithm
 def stemming(text):
-	words = word_tokenize(sentence)
-	stemmed_words = [stemmer.stem(word) for word in words]
+	words = word_tokenize(text)
+	pos_tags = pos_tag(words)
+	stemmed_words = [
+	    word if tag in ['NNP', 'NNPS'] else stemmer.stem(word)  # Skip proper nouns
+	    for word, tag in pos_tags
+	]
 	stemmed_sentence = ' '.join(stemmed_words)
+	# stemmed_words = [stemmer.stem(word) for word in words]
+	# stemmed_sentence = ' '.join(stemmed_words)
 	return stemmed_sentence
+
+# Return names found in given text
+def find_person(text):
+	if type(text) is not type('str'):
+		print('error')
+		return
+	person = []
+	doc = nlp(text)
+	for ent in doc.ents:
+		if ent.label_ == "PERSON":
+			person.append(ent)
+	return person
 
 # Return sentiment score of the given tweet
 def sentiment_scores(sentence):
@@ -43,7 +62,8 @@ text = ''
 nominees = []
 freq = []
 sentiment = []
-award = []
+awards = [] # TODO
+award_found = []
 for i in range(0, len(dataset['text'])):
 	if (type(dataset['text'][i]) is not type("str")):
 	    print(int(i + 2))
@@ -56,18 +76,35 @@ for i in range(0, len(dataset['text'])):
 	# text = re.sub('')
 	# text = normalize(text)
 
-	# tmp = stemming(text)
-	matches = re.findall(r"(.+) (win|receive|get) (.+)", text)
+	tmp = stemming(text)
+	matches = re.findall(r"(.+) (win|receive|get) (.+)", tmp)
 	
 	if matches:
-		doc = nlp(matches[0][2])
-		score = fuzz.partial_ratio(string1, string2)
+		score = 80 # threshold
+		award_tmp = ''
+		for a in awards:
+			tmp = fuzz.partial_ratio(matches[0][2], a)
+			if tmp > score:
+				award_tmp = a
+		if award_tmp:
+			doc = nlp(matches[0][0])
+			for ent in doc.ents:
+				if ent.label_ == "PERSON": # person exists & award exists
+					award_found.append(award_tmp)
+					nominees.append(ent.text)
+					# freq?
+		else: 
+			# TODO: person exists, award doesn't
+			continue
+	else:
+		doc = nlp(text)
+		for ent in doc.ents:
+			if ent.label_ == "PERSON":
+				# TODO: no pattern but person exists
+				continue
 
-	doc = nlp(text)
-	for ent in doc.ents:
-        if ent.label_ == "PERSON":
-            if ent not in nominees:
-            	nominees.append(ent)
+print(award_found)
+print(nominees)			
 
 
 

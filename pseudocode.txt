@@ -21,3 +21,8 @@ for p in person:
 for show:
 	if fits:
 		for awards for show
+
+1: award yes ppl no: quit
+2: ppl yes award no: keep tracking
+3: award no ppl no: quit
+4: ppl yes award yes:
