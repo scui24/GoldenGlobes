@@ -4,6 +4,7 @@ import re
 import unidecode
 import spacy
 import nltk
+from nltk import pos_tag
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
@@ -56,13 +57,13 @@ def sentiment_scores(sentence):
     sentiment_dict = sid_obj.polarity_scores(sentence)
     return sentiment_dict['compound']
 
-dataset = pd.read_csv('subset.csv')
+dataset = pd.read_csv('output.csv')
 
 text = ''
 nominees = []
 freq = []
 sentiment = []
-awards = [] # TODO
+awards = ['best performance', 'best performance supporting role', 'best director', 'cecil b. demille award'] # TODO
 award_found = []
 for i in range(0, len(dataset['text'])):
 	if (type(dataset['text'][i]) is not type("str")):
@@ -80,16 +81,21 @@ for i in range(0, len(dataset['text'])):
 	matches = re.findall(r"(.+) (win|receive|get) (.+)", tmp)
 	
 	if matches:
-		score = 80 # threshold
+		score = 70 # threshold
 		award_tmp = ''
 		for a in awards:
 			tmp = fuzz.partial_ratio(matches[0][2], a)
 			if tmp > score:
 				award_tmp = a
+				# print('found')
 		if award_tmp:
 			doc = nlp(matches[0][0])
 			for ent in doc.ents:
 				if ent.label_ == "PERSON": # person exists & award exists
+					if ent.text in nominees:
+						index = nominees.index(ent.text)
+						if award_found[index] == award_tmp:
+							continue
 					award_found.append(award_tmp)
 					nominees.append(ent.text)
 					# freq?
@@ -104,7 +110,8 @@ for i in range(0, len(dataset['text'])):
 				continue
 
 print(award_found)
-print(nominees)			
+print(nominees)
+print(len(award_found))
 
 
 
