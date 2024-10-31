@@ -1,16 +1,14 @@
+
 import json
 from collections import defaultdict
-
 # Load the data
-with open('output.json', 'r') as f:
+with open('raw_output.json', 'r') as f:
     data = json.load(f)
-
 consolidated_results = defaultdict(lambda: {
     'nominees': [],
     'winner': None,
     'max_mentions': 0  
 })
-
 # Group nominees under each consolidated award category
 for nominee_data in data['nominees']:
     award = nominee_data['award'].strip().lower()  
@@ -27,7 +25,6 @@ for nominee_data in data['nominees']:
     if mentions > consolidated_results[award]['max_mentions']:
         consolidated_results[award]['winner'] = nominee_name
         consolidated_results[award]['max_mentions'] = mentions
-
 # Format results 
 formatted_results = {}
 for award, details in consolidated_results.items():
@@ -37,8 +34,6 @@ for award, details in consolidated_results.items():
         'presenters': [] 
     }
 
-# Save the formatted results 
-with open('formatted_award_results.json', 'w') as f:
+with open('formatted_award_results-1.json', 'w') as f:
     json.dump(formatted_results, f, indent=4)
-
-print("Consolidated and formatted results saved to 'formatted_award_results.json'")
+print("Consolidated and formatted results saved to 'formatted_award_results-1.json'")
