@@ -12,7 +12,8 @@ from nltk.stem import WordNetLemmatizer
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from ftfy import fix_text
 from fuzzywuzzy import fuzz
-from imdb import IMDb
+# from imdb import IMDb
+from tqdm import tqdm 
 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
@@ -20,7 +21,7 @@ stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
 nlp = spacy.load("en_core_web_sm")
-ia = IMDb()
+# ia = IMDb()
 
 # Stemming algorithm
 def stemming(text):
@@ -68,7 +69,8 @@ awards = ['best performance actor', 'best performance actress', 'best performanc
 # awards_work = ['best screenplay', 'best foreign language film', 'best motion picture', 'best mini-series', 'best original score', 'best television series', 'best animated feature film', 'best original song']
 award_found = []
 x = 0
-for i in range(0, len(dataset['text'])):
+for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
+
 	if (type(dataset['text'][i]) is not type("str")):
 	    print(int(i + 2))
 	    # text.append("error")
@@ -135,18 +137,18 @@ with open('answer.csv', mode='w', newline='') as file:
         writer.writerow(row)
 
 
-# print(award_found)
-# print(nominees)
-# print(len(award_found))
-# print(len(nominees))
-# print(x)
+print(award_found)
+print(nominees)
+print(len(award_found))
+print(len(nominees))
+print(x)
 
-# for i in range(len(nominees)):
-# 	# if award_found[i] in ['best performance actor', 'best performance actress', 'best performance supporting role actor', 'best performance supporting role actress']:
-# 	# 	tmp = get_actor_work_types(nominees[i], 2013)
-# 	# 	if tmp:
-# 	# 		award = award_found[i] + ' in a ' + tmp[0]
-# 	print(f"Nominee: {nominees[i]}, Award: {award_found[i]}")
+for i in range(len(nominees)):
+	# if award_found[i] in ['best performance actor', 'best performance actress', 'best performance supporting role actor', 'best performance supporting role actress']:
+	# 	tmp = get_actor_work_types(nominees[i], 2013)
+	# 	if tmp:
+	# 		award = award_found[i] + ' in a ' + tmp[0]
+	print(f"Nominee: {nominees[i]}, Award: {award_found[i]}")
 
 
 
