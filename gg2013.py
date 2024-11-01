@@ -3,25 +3,12 @@ import csv
 import re
 import unidecode
 import spacy
-import nltk
-from nltk import pos_tag
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from ftfy import fix_text
 from fuzzywuzzy import fuzz
-# from imdb import IMDb
 from tqdm import tqdm 
 
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-stemmer = PorterStemmer()
-lemmatizer = WordNetLemmatizer()
-stop_words = set(stopwords.words('english'))
 nlp = spacy.load("en_core_web_sm")
-# ia = IMDb()
 
 # Stemming algorithm
 def stemming(text):
@@ -68,6 +55,19 @@ def detect_presenter(text):
             if ent.label_ == "PERSON":
                 return ent.text
     return None
+
+# Return true if the given sentence is a hypothetical statement
+def hypothetical(sentence):
+	hypothetical_keywords = ["if", "could", "would", "might", "may", "should", "suppose", "imagine", "in case", "as if", "next"]
+	doc = nlp(sentence)
+	for token in doc:
+		if token.text.lower() in hypothetical_keywords:
+			return True
+		if token.dep_ == "mark" and token.text.lower() == "if": # if statement
+			return True
+		if token.lemma_ == "wish" or (token.tag_ == "VBD" and token.dep_ == "advcl"): # subjunctive mood indicator
+			return True
+	return False
 
 dataset = pd.read_csv('output.csv')
 dataset_movie = pd.read_csv('title_basics.csv', low_memory=False)
@@ -142,10 +142,27 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 							award_found.append(award_tmp)
 							nominees.append(ent.text)
 							freq.append(1)
+							
 	presenter = detect_presenter(text)
 	if presenter and presenter not in presenters and presenter[0:2] != "RT":
 		presenters.append(presenter)
 
+	if 'host' in text and not hypothetical(text):
+		doc = nlp(text)
+		for ent in doc.ents:
+			if ent.label_ == "PERSON":
+				if ent.text in hosts:
+					freq_host[hosts.index(ent.text)] += 1
+				else:
+					hosts.append(ent.text)
+					freq_host.append(1)
+
+
+with open('host.csv', mode='w', newline='') as file:
+	writer = csv.writer(file)
+	writer.writerow(['Host', 'Frequency'])
+	for row in zip(hosts, freq_host):
+		writer.writerow(row)
 
 with open('answer.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
