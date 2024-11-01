@@ -58,6 +58,17 @@ def sentiment_scores(sentence):
     sentiment_dict = sid_obj.polarity_scores(sentence)
     return sentiment_dict['compound']
 
+# Detect a presenter in the given text.
+def detect_presenter(text):
+    
+    presenter_match = re.findall(r"(.+) (present|introduce|announce) (.+)", text)
+    if presenter_match:
+        doc = nlp(presenter_match[0][0])
+        for ent in doc.ents:
+            if ent.label_ == "PERSON":
+                return ent.text
+    return None
+
 dataset = pd.read_csv('output.csv')
 dataset_movie = pd.read_csv('title_basics.csv', low_memory=False)
 
@@ -69,6 +80,9 @@ awards = ['best performance actor', 'best performance actress', 'best performanc
 # awards_work = ['best screenplay', 'best foreign language film', 'best motion picture', 'best mini-series', 'best original score', 'best television series', 'best animated feature film', 'best original song']
 award_found = []
 x = 0
+
+presenters = []
+
 for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 
 	if (type(dataset['text'][i]) is not type("str")):
@@ -128,6 +142,9 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 							award_found.append(award_tmp)
 							nominees.append(ent.text)
 							freq.append(1)
+	presenter = detect_presenter(text)
+	if presenter and presenter not in presenters and presenter[0:2] != "RT":
+		presenters.append(presenter)
 
 
 with open('answer.csv', mode='w', newline='') as file:
@@ -136,12 +153,17 @@ with open('answer.csv', mode='w', newline='') as file:
     for row in zip(nominees, award_found, freq):
         writer.writerow(row)
 
+    writer.writerow([])
+    writer.writerow(["Presenters"])
+    for presenter in presenters:
+        writer.writerow([presenter])
 
+# Print results
 print(award_found)
 print(nominees)
+print("Presenters and Awards:", presenters)
 print(len(award_found))
 print(len(nominees))
-print(x)
 
 for i in range(len(nominees)):
 	# if award_found[i] in ['best performance actor', 'best performance actress', 'best performance supporting role actor', 'best performance supporting role actress']:
