@@ -96,7 +96,7 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 	text = re.sub(r'["\'@]', '', text)
 
 	tmp = stemming(text)
-	matches = re.findall(r"(.+) (win|receive|get) (.+)", tmp)
+	matches = re.findall(r"(.+) (win|won|wins|winning|receive|received|receives|receiving|get|gets|got|getting) (.+)", tmp)
 	
 	if matches:
 		score = 70 # threshold
