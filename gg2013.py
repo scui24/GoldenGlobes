@@ -77,9 +77,7 @@ nominees = []
 freq = []
 sentiment = []
 awards = ['best performance actor', 'best performance actress', 'best performance supporting role actor', 'best performance supporting role actress', 'best director']
-# awards_work = ['best screenplay', 'best foreign language film', 'best motion picture', 'best mini-series', 'best original score', 'best television series', 'best animated feature film', 'best original song']
 award_found = []
-x = 0
 
 presenters = []
 
@@ -101,7 +99,6 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 	matches = re.findall(r"(.+) (win|receive|get) (.+)", tmp)
 	
 	if matches:
-		x += 1
 		score = 70 # threshold
 		award_tmp = ''
 		for a in awards:
@@ -142,7 +139,7 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 							award_found.append(award_tmp)
 							nominees.append(ent.text)
 							freq.append(1)
-							
+
 	presenter = detect_presenter(text)
 	if presenter and presenter not in presenters and presenter[0:2] != "RT":
 		presenters.append(presenter)
