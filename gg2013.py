@@ -45,17 +45,6 @@ def sentiment_scores(sentence):
     sentiment_dict = sid_obj.polarity_scores(sentence)
     return sentiment_dict['compound']
 
-# Detect a presenter in the given text.
-def detect_presenter(text):
-    
-    presenter_match = re.findall(r"(.+) (present|introduce|announce) (.+)", text)
-    if presenter_match:
-        doc = nlp(presenter_match[0][0])
-        for ent in doc.ents:
-            if ent.label_ == "PERSON":
-                return ent.text
-    return None
-
 # Return true if the given sentence is a hypothetical statement
 def hypothetical(sentence):
 	hypothetical_keywords = ["if", "could", "would", "might", "may", "should", "suppose", "imagine", "in case", "as if", "next"]
@@ -79,7 +68,7 @@ sentiment = []
 awards = ['best performance actor', 'best performance actress', 'best performance supporting role actor', 'best performance supporting role actress', 'best director']
 award_found = []
 
-presenters = []
+presenters = {} # Dictionary where presenters[award] is a list of two names
 
 for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 
@@ -140,10 +129,6 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 							nominees.append(ent.text)
 							freq.append(1)
 
-	presenter = detect_presenter(text)
-	if presenter and presenter not in presenters and presenter[0:2] != "RT":
-		presenters.append(presenter)
-
 	if 'host' in text and not hypothetical(text):
 		doc = nlp(text)
 		for ent in doc.ents:
@@ -167,15 +152,10 @@ with open('answer.csv', mode='w', newline='') as file:
     for row in zip(nominees, award_found, freq):
         writer.writerow(row)
 
-    writer.writerow([])
-    writer.writerow(["Presenters"])
-    for presenter in presenters:
-        writer.writerow([presenter])
 
 # Print results
 print(award_found)
 print(nominees)
-print("Presenters and Awards:", presenters)
 print(len(award_found))
 print(len(nominees))
 
