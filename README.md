@@ -1,5 +1,5 @@
 # GoldenGlobes
-# gg-project_Group 3
+# gg-project-Group 3
  
 CS337 Project 1 -- Tweet Mining & The Golden Globes 
 
