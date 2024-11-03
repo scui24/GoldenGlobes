@@ -52,10 +52,11 @@ def pre_ceremony():
     plain text file. It is the first thing the TA will run when grading.
     Do NOT change the name of this function or what it returns.'''
      
-    with open("gg2013.py") as f:
-        exec(f.read())
     with open("Conversion.py") as f:
         exec(f.read())
+    with open("gg2013.py") as f:
+        exec(f.read())
+    
     
     print("Pre-ceremony processing complete.")
     return
