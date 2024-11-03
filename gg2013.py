@@ -139,7 +139,7 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 					hosts.append(ent.text)
 					freq_host.append(1)
 
-	if 'cecil b. demille' in text.lower():
+	if 'cecil' in text.lower() or 'demille' in text.lower():
 		doc = nlp(text)
 		for ent in doc.ents:
 			if ent.label_ == "PERSON":
