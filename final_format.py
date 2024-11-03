@@ -17,11 +17,24 @@ def load_hosts():
         hosts = ["host1", "host2"]  # Default names if host.csv is missing
     return hosts
 
+def load_presenters():
+    presenters_data = defaultdict(list)
+    if os.path.exists('presenters.csv'):
+        with open('presenters.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                award = row['Award'].strip().lower()
+                presenters = [row[col].strip() for col in ['Presenter 1', 'Presenter 2'] if row[col] and row[col].strip()]
+                presenters_data[award] = presenters
+    return presenters_data
+
+
 def main():
     dataset = pd.read_csv('output.csv')
     timestamp_ms = dataset['timestamp_ms'].iloc[0]
     year = datetime.fromtimestamp(timestamp_ms / 1000.0).year
 
+    # Load award nominees and winners
     with open('answer.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         award_data = defaultdict(lambda: {'nominees': [], 'winner': None, 'max_frequency': 0})
@@ -37,11 +50,13 @@ def main():
                 award_data[award]['winner'] = nominee
                 award_data[award]['max_frequency'] = frequency
 
+    # Load presenters and add them to award_data
+    presenters_data = load_presenters()
     formatted_award_data = {}
     for award, details in award_data.items():
         formatted_award_data[award] = {
             'nominees': details['nominees'],
-            'presenters': [],
+            'presenters': presenters_data.get(award, []),
             'winner': details['winner']
         }
 
@@ -58,4 +73,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
