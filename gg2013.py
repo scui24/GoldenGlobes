@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import re
 import spacy
+import unidecode
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from ftfy import fix_text
 from fuzzywuzzy import fuzz
@@ -170,6 +171,66 @@ with open('answer.csv', mode='w', newline='') as file:
     for row in zip(nominees, award_found, freq):
         writer.writerow(row)
 
+# Presenters 
+
+# Load data
+dataset = pd.read_csv('output.csv')
+awards = ['best actor', 'best actress', 'best supporting actor', 
+          'best supporting role actress', 'best director']
+presenters = {award: [] for award in awards}
+presenter_freq = {award: {} for award in awards}
+similarity_threshold = 70  # Adjust based on needed sensitivity
+
+def match_award(text, awards, threshold=similarity_threshold):
+    """Return the closest matching award if similarity above the threshold; otherwise None."""
+    for award in awards:
+        score = fuzz.partial_ratio(text, award)
+        if score >= threshold:
+            return award
+    return None
+
+# Process tweets
+for i in tqdm(range(len(dataset['text'])), desc="Processing tweets"):
+    text = str(dataset['text'][i])
+    text = fix_text(text)
+    text = unidecode.unidecode(text)
+    text = re.sub(r'http\S+', '', text)
+    text = re.sub(r'(?i)\bGolden\s*Globes\b|\bgoldenglobes\b', '', text)
+    text = re.sub(r"'s\b'", '', text)
+    text = re.sub(r'["\'@]', '', text)
+
+    # Check for presenters only if phrase is relevant and not hypothetical
+    if ('present' in text or 'introduce' in text) and not hypothetical(text):
+        # Identify closest matching award name within the text
+        matched_award = match_award(text, awards)
+        
+        if matched_award:
+            doc = nlp(text)
+            for ent in doc.ents:
+                if ent.label_ == "PERSON":
+                    presenter_name = ent.text
+                    if presenter_name.startswith("RT"): # ignore retweets / handles from retweet
+                        continue
+                    if presenter_name in presenter_freq[matched_award]:
+                        presenter_freq[matched_award][presenter_name] += 1
+                    else:
+                        presenter_freq[matched_award][presenter_name] = 1
+
+# Select the top two presenters for each award
+for award, freq_dict in presenter_freq.items():
+    top_presenters = sorted(freq_dict, key=freq_dict.get, reverse=True)[:2]
+    presenters[award] = top_presenters
+
+# Write results to CSV
+with open('presenters.csv', mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Award", "Presenter 1", "Presenter 2"])
+    for award, pres_list in presenters.items():
+        writer.writerow([award] + pres_list)
+
+# Print results
+for award, pres_list in presenters.items():
+    print(f"Award: {award}, Presenters: {', '.join(pres_list)}")
 
 
 
