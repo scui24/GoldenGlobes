@@ -25,15 +25,9 @@ This project uses a variety of natural language processing (NLP) and text-proces
 
 ## Setup Instructions
 
-The setup process automates the creation of a Conda environment, installs the required libraries from a `environment.yml` file. Create the environment, activate it, then download the SpaCy language model.
+The setup process automates the creation of a Conda environment, installs the required libraries from a `environment.yml` file. Create the environment, activate it, then download above reuiqred packages/libraries.
 
-### Prerequisites
-
-Make sure you have the following installed on your machine:
-
-- **Conda**: For environment management.
-- **Python 3.10**: Required Python version.
-- **Pip**: Package manager for Python packages.
+## How to run the Python script
 
 
 
