@@ -25,9 +25,11 @@ This project uses a variety of natural language processing (NLP) and text-proces
 
 ## Setup Instructions
 
-The setup process automates the creation of a Conda environment, installs the required libraries from a `environment.yml` file. Create the environment, activate it, then download above reuiqred packages/libraries.
+The setup process automates the creation of a Conda environment, installs and downloads the required libraries from a `environment.yml` file. 
 
-## How to run the Python script
+## Group 3 Github repository
+ You can access our group's Github repository through following address: https://github.com/scui24/GoldenGlobes.git
+ 
 
 
 
