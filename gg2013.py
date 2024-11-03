@@ -62,8 +62,8 @@ dataset = pd.read_csv('output.csv')
 dataset_movie = pd.read_csv('title_basics.csv', low_memory=False)
 
 text = ''
-nominees = []
-freq = []
+nominees, hosts, cecil = [], [], []
+freq, freq_host, freq_cecil = [], [], []
 sentiment = []
 awards = ['best performance actor', 'best performance actress', 'best performance supporting role actor', 'best performance supporting role actress', 'best director']
 award_found = []
@@ -139,6 +139,20 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 					hosts.append(ent.text)
 					freq_host.append(1)
 
+	if 'cecil b. demille' in text.lower():
+		doc = nlp(text)
+		for ent in doc.ents:
+			if ent.label_ == "PERSON":
+				if ent.text in cecil:
+					cecil[cecil.index(ent.text)] += 1
+				else:
+					cecil.append(ent.text)
+					freq_cecil.append(1)
+
+for i in range(len(cecil)):
+	nominees.append(cecil[i])
+	award_found.append('cecil b. demille')
+	freq.appemd(freq_cecil[i])
 
 with open('host.csv', mode='w', newline='') as file:
 	writer = csv.writer(file)
