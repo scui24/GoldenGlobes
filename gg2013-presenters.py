@@ -6,7 +6,7 @@ import unidecode
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from ftfy import fix_text
 from fuzzywuzzy import fuzz
-from tqdm import tqdm
+from tqdm import tqdm 
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -58,6 +58,7 @@ awards = ['best performance actor', 'best performance actress', 'best performanc
 award_found = []
 appearance = ["dress", "outfit", "style", "look"]
 dress = []
+
 presenters = {} # Dictionary where presenters[award] is a list of two names
 
 for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
@@ -72,7 +73,6 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 	text = re.sub(r'(?i)\bGolden\s*Globes\b|\bgoldenglobes\b', '', text)
 	text = re.sub(r"'s\b'", '', text) # remove 's at the end of a word
 	text = re.sub(r'["\'@]', '', text)
-	text = re.sub(r'RT', '', text)
 
 	matches = re.findall(r"(.+) (win|won|wins|winning|receive|received|receives|receiving|get|gets|got|getting) (.+)", text)
 
@@ -144,15 +144,14 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 					dress.append(ent.text)
 					sentiment.append(sent)
 
-# Cecil b. demille award
 for i in range(len(cecil)):
 	nominees.append(cecil[i])
 	award_found.append('cecil b. demille')
 	freq.append(freq_cecil[i])
 
 # Print results
-for i in range(len(nominees)):
-	print(f"Nominee: {nominees[i]}, Award: {award_found[i]}")
+# for i in range(len(nominees)):
+# 	print(f"Nominee: {nominees[i]}, Award: {award_found[i]}")
 
 max_sent = max(sentiment)
 print('Best dress: ' + str(dress[sentiment.index(max_sent)]))
@@ -176,8 +175,6 @@ with open('answer.csv', mode='w', newline='') as file:
 
 # Load data
 dataset = pd.read_csv('output.csv')
-awards = ['best actor', 'best actress', 'best supporting actor', 
-          'best supporting role actress', 'best director']
 presenters = {award: [] for award in awards}
 presenter_freq = {award: {} for award in awards}
 similarity_threshold = 70  # Adjust based on needed sensitivity
@@ -232,6 +229,3 @@ with open('presenters.csv', mode='w', newline='') as file:
 # Print results
 for award, pres_list in presenters.items():
     print(f"Award: {award}, Presenters: {', '.join(pres_list)}")
-
-
-
