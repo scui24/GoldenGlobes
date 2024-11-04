@@ -77,9 +77,14 @@ def main():
         data1 = json.load(file)
         print (data1)
     # human-readable output of most discusses people, most, controversial people with sentiment score
-     with open('tweet_analysis_results.json', 'r') as file:
+    with open('tweet_analysis_results.json', 'r') as file:
         data2 = json.load(file)
         print (data2)
-
+    # human-readable output of best and worst addressing
+    with open('dressing.csv', mode ='r')as file:
+        csvFile = csv.reader(file)
+        for i in csvFile:
+        print(i)
+        
 if __name__ == "__main__":
     main()
