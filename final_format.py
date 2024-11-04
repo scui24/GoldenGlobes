@@ -71,6 +71,15 @@ def main():
     output_filename = f'gg{year}answers.json'
     with open(output_filename, 'w') as jsonfile:
         json.dump(output_data, jsonfile, indent=4)
+        
+    # human-readable output of host, award, presenters, nominees, winner
+    with open('f'gg{year}answers.json'', 'r') as file:
+        data1 = json.load(file)
+        print (data1)
+    # human-readable output of most discusses people, most, controversial people with sentiment score
+     with open('tweet_analysis_results.json', 'r') as file:
+        data2 = json.load(file)
+        print (data2)
 
 if __name__ == "__main__":
     main()
