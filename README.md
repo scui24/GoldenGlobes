@@ -27,6 +27,15 @@ This project uses a variety of natural language processing (NLP) and text-proces
    
 10. **NLTK**: The Natural Language Toolkit (NLTK) is a comprehensive library for working with human language data (text) in Python, including text classification, tokenization, stemming, tagging, parsing, and more.
     
+11. **json**: json is the python built-in module that is specifically designed for reading and writing json data.
+    
+12. **collections**: collections is the python module implements specialized container datatypes providing alternatives to Python’s general purpose built-in containers, dict, list, set, and tuple.
+    
+13. **datetime**: The datetime module supplies classes for manipulating dates and times.
+
+14. **OS**：The OS module in Python provides functions for interacting with the operating system.
+    
+    
  
 
 ## Setup Instructions
