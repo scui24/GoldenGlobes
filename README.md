@@ -39,10 +39,15 @@ The setup process automates the creation of a Conda environment, installs and do
 
 ## Steps to run the the python files in the submission folder
 Step 1: Input into submission folder gg{year}.jsonl 
+
 Step 2: Open conversion.py and change the year to match the year of the data. 
+
 Step 3: Run conversion.py  
+
 Step 4. Run gg2013.py 
+
 Step 5. Run extra_tasks.py 
+
 Step 6. Run final_format.py. Final_format.py will print out the human-readable format and save the autograder format to gg{year}answers.py
 
 
