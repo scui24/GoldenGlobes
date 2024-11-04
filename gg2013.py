@@ -2,7 +2,7 @@ import pandas as pd
 import csv
 import re
 import spacy
-import unidecode
+from unidecode import unidecode
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from ftfy import fix_text
 from fuzzywuzzy import fuzz
@@ -49,11 +49,12 @@ def hypothetical(sentence):
 
 # Return the closest matching award if similarity above the threshold; otherwise None.
 def match_award(text, awards, threshold=70):
-    for award in awards:
-        score = fuzz.partial_ratio(text, award)
-        if score >= threshold:
-            return award
-    return None
+	for award in awards:
+		if award != 'best \\N':
+			score = fuzz.partial_ratio(text, award)
+			if score >= threshold:
+				return award
+	return None
 
 dataset = pd.read_csv('output.csv')
 dataset_movie = pd.read_csv('title_basics.csv', low_memory=False)
@@ -66,23 +67,21 @@ awards = ['best performance actor', 'best performance actress', 'best performanc
 award_found = []
 appearance = ["dress", "outfit", "style", "look"]
 dress = []
-presenters = {award: [] for award in awards}
-presenter_freq = {award: {} for award in awards}
-similarity_threshold = 70  # Adjust based on needed sensitivity
+tweets = []
 
 for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 
 	if (type(dataset['text'][i]) is not type("str")):
-	    print(int(i + 2))
-	    # text.append("error")
 	    continue
 
 	text = fix_text(dataset['text'][i])
+	text = unidecode(text)
 	text = re.sub(r'http\S+', '', text)
 	text = re.sub(r'(?i)\bGolden\s*Globes\b|\bgoldenglobes\b', '', text)
 	text = re.sub(r"'s\b'", '', text) # remove 's at the end of a word
 	text = re.sub(r'["\'@]', '', text)
 	text = re.sub(r'RT', '', text)
+	tweets.append(text)
 
 	matches = re.findall(r"(.+) (win|won|wins|winning|receive|received|receives|receiving|get|gets|got|getting) (.+)", text)
 
@@ -154,13 +153,18 @@ for i in tqdm(range(0, len(dataset['text'])), desc="Processing tweets"):
 					dress.append(ent.text)
 					sentiment.append(sent)
 
+presenters = {award: [] for award in award_found}
+presenter_freq = {award: {} for award in award_found}
+similarity_threshold = 70  # Adjust based on needed sensitivity
+
+for tw in tweets:
 	# Check for presenters only if phrase is relevant and not hypothetical
-	if ('present' in text or 'introduce' in text) and not hypothetical(text):
+	if ('present' in tw or 'introduce' in tw) and not hypothetical(tw):
 		# Identify closest matching award name within the text
-		matched_award = match_award(text, awards)
+		matched_award = match_award(tw, award_found)
 
 		if matched_award:
-			doc = nlp(text)
+			doc = nlp(tw)
 			for ent in doc.ents:
 				if ent.label_ == "PERSON":
 					presenter_name = ent.text
@@ -187,16 +191,6 @@ max_sent = max(sentiment)
 best_dressed = dress[sentiment.index(max_sent)]
 min_sent = min(sentiment)
 worst_dressed = dress[sentiment.index(min_sent)]
-
-# Print results
-for i in range(len(nominees)):
-	print(f"Nominee: {nominees[i]}, Award: {award_found[i]}")
-
-print('Best dress: ' + str(best_dressed))
-print('Worst dress: ' + str(worst_dressed))
-
-for award, pres_list in presenters.items():
-    print(f"Award: {award}, Presenters: {', '.join(pres_list)}")
 
 # Write csv
 with open('dressing.csv', mode='w', newline='') as file:
