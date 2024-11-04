@@ -13,6 +13,7 @@ def load_hosts():
             for row in reader:
                 host_name = row['Host'].strip()
                 hosts.append(host_name)
+        hosts = hosts[:2]  # Keep only the top 2 hosts
     else:
         hosts = ["host1", "host2"]  # Default names if host.csv is missing
     return hosts
