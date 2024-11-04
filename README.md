@@ -26,7 +26,8 @@ This project uses a variety of natural language processing (NLP) and text-proces
 9.  **tqdm** is a Python library that provides a fast, extensible progress bar for loops and iterables, making it easy to visualize the progress of your code.
    
 10. **NLTK**: The Natural Language Toolkit (NLTK) is a comprehensive library for working with human language data (text) in Python, including text classification, tokenization, stemming, tagging, parsing, and more.
-
+    
+ 
 
 ## Setup Instructions
 
@@ -36,9 +37,13 @@ The setup process automates the creation of a Conda environment, installs and do
  You can access our group's Github repository through following address: https://github.com/scui24/GoldenGlobes.git
  
 
-
-
-
+## Steps to run the the python files in the submission folder
+Step 1: Input into submission folder gg{year}.jsonl 
+Step 2: Open conversion.py and change the year to match the year of the data. 
+Step 3: Run conversion.py  
+Step 4. Run gg2013.py 
+Step 5. Run extra_tasks.py 
+Step 6. Run final_format.py. Final_format.py will print out the human-readable format and save the autograder format to gg{year}answers.py
 
 
 
